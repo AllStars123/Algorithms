@@ -1,36 +1,41 @@
-# Найти максимальный элемент среди минимальных элементов столбцов матрицы
+# Пользователь вводит данные о количестве предприятий, их наименования и прибыль
+# за 4 квартала (т.е. 4 отдельных числа) для каждого предприятия..
+# Программа должна определить среднюю прибыль (за год для всех предприятий) и
+# вывести наименования предприятий, чья прибыль выше среднего и отдельно вывести наименования предприятий,
+# чья прибыль ниже среднего.
 
 
-# Сложность - O(n^2)
-# Время выполнения 12.729 при ручном вводе
+rows = int(input('Введите количество предприятий: '))
+columns = 4
+matrix = []
+average = {}
+for i in range(rows):
+    arr = []
+    print(f'Прибыль {i + 1}-ого предприятия:  ')
+    for j in range(columns):
+        arr.append(int(input(f'Прибыль за {j + 1}-ый квартал: ')))
 
-import cProfile
-
-
-def mat():
-    rows, columns = int(input('Введи количество строк: ')), int(input('Введи количество столбцов: '))
-
-    matrix = []
-    min_in_rows = []
-
-    for i in range(rows):
-        print(f'{i + 1}-я строка')
-        arr = []
-        for j in range(columns):
-            arr.append(int(input()))
-        matrix.append(arr)
-        min_in_rows.append(min(arr))
-
-    for i in range(rows):
-        for j in range(columns):
-            print(matrix[i][j], end=' ')
-        print()
-
-    print(f'Максимально число из минимальных: {max(min_in_rows)}')
+    matrix.append(arr)
+    s = sum(matrix[i]) / 4
+    average[f'Предприятие {i + 1}'] = s
 
 
-def main():
-    mat()
+av = 0
+for items in average.values():
+    av += items
+av = av / rows
+
+more = []
+less = []
 
 
-cProfile.run('main()')
+for k, v in average.items():
+    if v > av:
+        more.append(k)
+    else:
+        less.append(k)
+
+print(f'Средняя прибыль всех предприятий: {av}')
+print(average)
+print('Больше средней прибыли:', *more)
+print('Меньше средней прибыли:', *less)
