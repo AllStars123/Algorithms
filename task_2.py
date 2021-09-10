@@ -1,50 +1,48 @@
-# Отсортируйте по возрастанию методом слияния одномерный вещественный массив,
-# заданный случайными числами на промежутке [0; 50).
-# Выведите на экран исходный и отсортированный массивы.
-import random
+# Закодируйте любую строку из трех слов по алгоритму Хаффмана.
+
+import heapq
+from collections import Counter
+from collections import namedtuple
 
 
-def merge(left_list, right_list):
-    sorted_list = []
-    left_list_index = right_list_index = 0
-
-    left_list_length, right_list_length = len(left_list), len(right_list)
-
-    for _ in range(left_list_length + right_list_length):
-        if left_list_index < left_list_length and right_list_index < right_list_length:
-
-            if left_list[left_list_index] <= right_list[right_list_index]:
-                sorted_list.append(left_list[left_list_index])
-                left_list_index += 1
-
-            else:
-                sorted_list.append(right_list[right_list_index])
-                right_list_index += 1
-
-        elif left_list_index == left_list_length:
-            sorted_list.append(right_list[right_list_index])
-            right_list_index += 1
-
-        elif right_list_index == right_list_length:
-            sorted_list.append(left_list[left_list_index])
-            left_list_index += 1
-
-    return sorted_list
+class Node(namedtuple("Node", ["left", "right"])):
+    def walk(self, code, acc):
+        self.left.walk(code, acc + "0")
+        self.right.walk(code, acc + "1")
 
 
-def merge_sort(nums):
-    if len(nums) <= 1:
-        return nums
-
-    mid = len(nums) // 2
-
-    left_list = merge_sort(nums[:mid])
-    right_list = merge_sort(nums[mid:])
-
-    return merge(left_list, right_list)
+class Leaf(namedtuple("Leaf", ["char"])):
+    def walk(self, code, acc):
+        code[self.char] = acc or "0"
 
 
-random_list_of_nums = [random.randint(0, 49) for _ in range(10)]
-print(random_list_of_nums)
-random_list_of_nums = merge_sort(random_list_of_nums)
-print(random_list_of_nums)
+def huffman_encode(s):
+    h = []
+    for ch, freq in Counter(s).items():
+        h.append((freq, len(h), Leaf(ch)))
+    heapq.heapify(h)
+    count = len(h)
+    while len(h) > 1:
+        freq1, _count1, left = heapq.heappop(h)
+        freq2, _count2, right = heapq.heappop(h)
+        heapq.heappush(h, (freq1 + freq2, count, Node(left, right)))
+        count += 1
+    code = {}
+    if h:
+        [(_freq, _count, root)] = h
+        root.walk(code, "")
+    return code
+
+
+def main():
+    s = input('Введите строку: ')
+    code = huffman_encode(s)
+    encoded = "".join(code[ch] for ch in s)
+    print(len(code), len(encoded))
+    for ch in sorted(code):
+        print("{}: {}".format(ch, code[ch]))
+    print(encoded)
+
+
+if __name__ == "__main__":
+    main()
